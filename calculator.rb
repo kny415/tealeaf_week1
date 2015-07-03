@@ -2,9 +2,9 @@
 
 require 'pry'
 
-def calc_me(a, b, c)
-  result = yield(a, b)
-  puts "#{c} = #{result}"
+def calc_me(num1, num2, input_str)
+  result = yield(num1, num2)
+  puts "#{input_str} = #{result}"
 end
 
 puts "enter calculation (ex: 1 + 2)"
@@ -18,13 +18,13 @@ puts nums.inspect
 if nums
   case nums[2]
   when '+'
-    calc_me(nums[1], nums[3], calc_str) { |a, b| a.to_i + b.to_i }
+    calc_me(nums[1], nums[3], calc_str) { |num1, num2| num1.to_i + num2.to_i }
   when '-'
-    calc_me(nums[1], nums[3], calc_str) { |a, b| a.to_i - b.to_i }
+    calc_me(nums[1], nums[3], calc_str) { |num1, num2| num1.to_i - num2.to_i }
   when '*'
-    calc_me(nums[1], nums[3], calc_str) { |a, b| puts a.to_i * b.to_i }
+    calc_me(nums[1], nums[3], calc_str) { |num1, num2|  num1.to_i * num2.to_i }
   when '/'
-    calc_me(nums[1], nums[3], calc_str) { |a, b| puts a.to_f / b.to_i }
+    calc_me(nums[1], nums[3], calc_str) { |num1, num2|  num1.to_f / num2.to_i }
   end
 end
 # binding.pry
