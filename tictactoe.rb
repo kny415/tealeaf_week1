@@ -39,7 +39,7 @@ end
 def update_score(player_score, index, board_size)
   player_score[index/board_size] += 1
   player_score[board_size + index % board_size] += 1
-  if ( index % (board_size + 1) == 0 )
+  if (index % (board_size + 1) == 0)
     player_score[board_size * 2] += 1
   end
   if ((index < board_size * board_size - 1) && (index % (board_size - 1) == 0) && (index > 0))
@@ -67,7 +67,7 @@ def winner?(score, board_size)
   score.select { |s| s >= board_size }.size > 0
 end
 
-puts "enter size: (3 for 3x3)"
+puts "enter size: (3 for 3x3, 4 for 4x4, ...)"
 board_size = gets.chomp.to_i
 
 board = init_board(board_size)
@@ -81,8 +81,8 @@ until board_full?(board)
   draw_board(board)
   puts "enter square index (1 - #{ board_size**2 }):  q to quit"
   players_pick = gets.chomp
-  
-  if ( /[1-9]/.match(players_pick) && square_not_taken?(board, players_pick.to_i))
+
+  if ( /[1-9]+/.match(players_pick) && square_not_taken?(board, players_pick.to_i))
     board[players_pick.to_i] = 'X'
     update_score(player_score, (players_pick.to_i - 1), board_size) 
     
@@ -105,5 +105,4 @@ until board_full?(board)
   elsif players_pick == 'q'
     break
   end
-
 end 
