@@ -67,8 +67,12 @@ def winner?(score, board_size)
   score.select { |s| s >= board_size }.size > 0
 end
 
-puts "enter size: (3 for 3x3, 4 for 4x4, ...)"
-board_size = gets.chomp.to_i
+board_size = 0
+
+until board_size >=3
+  puts "enter size: (3 for 3x3, 4 for 4x4, ...)"
+  board_size = gets.chomp.to_i
+end
 
 board = init_board(board_size)
 player_score = init_scores(board_size)
