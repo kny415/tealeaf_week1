@@ -20,14 +20,14 @@ def init_scores(size)
   player_score
 end
 
-def draw_board(b)
+def draw_board(board)
   system 'clear'
-  size = Math.sqrt(b.size)
-  (1..b.size).each do |count|
-    print " " + b[count].to_s
+  size = Math.sqrt(board.size)
+  (1..board.size).each do |count|
+    print " " + board[count].to_s
     if (count % size != 0)
       print " |" 
-    elsif (count != b.size)
+    elsif (count != board.size)
       print "\n"
       size.to_i.times { print "----" } 
       print "\n"
@@ -47,20 +47,20 @@ def update_score(player_score, index, board_size)
   end
 end
 
-def board_full?(b)
-  b.select { |k, v| b[k] == ' ' }.empty?
+def board_full?(board)
+  board.select { |k, v| board[k] == ' ' }.empty?
 end 
 
-def get_empty_squares(b)
-  b.select { |k, v| b[k] == ' ' }.keys
+def get_empty_squares(board)
+  board.select { |k, v| board[k] == ' ' }.keys
 end
 
-def square_not_taken?(b, index)
-  get_empty_squares(b).include?(index)
+def square_not_taken?(board, index)
+  get_empty_squares(board).include?(index)
 end
 
-def computers_turn(b)
-  get_empty_squares(b).sample
+def computers_turn(board)
+  get_empty_squares(board).sample
 end
 
 def winner?(score, board_size)
@@ -69,7 +69,7 @@ end
 
 board_size = 0
 
-until board_size >=3
+until board_size >= 3
   puts "enter size: (3 for 3x3, 4 for 4x4, ...)"
   board_size = gets.chomp.to_i
 end
