@@ -53,6 +53,7 @@ def total_cards(cards)
   cards.each do |card| 
     if value_and_suit = /(\d+)([hscd])/.match(card)
       card_value = value_and_suit[0].to_i
+      # binding.pry
     elsif value_and_suit = /([JQK])([hscd])/.match(card)
       card_value = 10
     elsif value_and_suit = /(A)([hscd])/.match(card)
@@ -90,9 +91,7 @@ def bust?(hand)
   total_cards(temp_hand) > 21
 end
 
-def show_hands(player_name, player_hand, dealer_hand, turn = PLAYER)
-  system 'clear'
-
+def show_help (msg)
   puts "Insurance: Insure at +3 or higher."
   puts "16vT: Stand at 0 or higher, hit otherwise."
   puts "15vT: Stand at +4 or higher, hit otherwise."
@@ -111,8 +110,19 @@ def show_hands(player_name, player_hand, dealer_hand, turn = PLAYER)
   puts "12v5: Stand at -2 or higher, hit otherwise."
   puts "12v6: Stand at -1 or higher, hit otherwise."
   puts "13v3: Stand at -2 or higher, hit otherwise.\n\n"
-  
-  puts "#{player_name}: #{player_hand.inspect}, #{total_cards(player_hand)}"
+
+  puts "2-6 = +1"
+  puts "T-A = -1"
+
+  puts "#{msg}"
+  puts "enter to continue"
+  gets.chomp
+end
+
+def show_hands(player_name, player_hand, dealer_hand, turn = PLAYER)
+  system 'clear'
+
+  puts "#{player_name}: #{player_hand.inspect}"
   # puts "no aces" if aces?(player_hand) == 0
   if (turn == DEALER)
     puts "Dealer: #{dealer_hand.inspect}, #{total_cards(dealer_hand)}"
@@ -126,18 +136,23 @@ end
 puts "Welcome to blackjack!  Please enter your name: "
 player_name = gets.chomp
 player_name = "Player 1" if player_name.size == 0
+puts "How many decks?"
+num_decks = gets.chomp.to_i
+
+shoe = init_shoe(num_decks)
+show_help "new deck..."
+
 puts "Ready #{player_name}..."
 sleep 1
 
-shoe = init_shoe
 begin
   player_hand = []
   dealer_hand = []
 
   # binding.pry
   if shoe.size < 52 * 0.3
-    shoe =  init_shoe
-    puts "new deck"
+    shoe =  init_shoe(num_decks)
+    show_help "new deck..."
   end
   #deal_cards
   (1..2).each do 
@@ -152,15 +167,21 @@ begin
   bust?(dealer_hand)
   show_hands(player_name, player_hand, dealer_hand)
 
+  # binding.pry
+
   if total_cards(dealer_hand) == 21
+    show_hands(player_name, player_hand, dealer_hand, DEALER)
     puts "Dealer has Blajack!"
+    # binding.pry
   elsif total_cards(player_hand) == 21
+    show_hands(player_name, player_hand, dealer_hand, DEALER)
     puts "#{player_name} has Blajack!"
   else
     begin
-      puts "\n(h)it or (s)tand"
+      puts "\n(h)it or (s)tand or help"
       user_choice = gets.chomp.downcase
       player_hand << deal_card(shoe) if user_choice == 'h'
+      show_help 'Count = #{$count}'  if user_choice == 'help'
       break if bust?(player_hand) || total_cards(player_hand) == 21
       show_hands(player_name, player_hand, dealer_hand)
       
