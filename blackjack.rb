@@ -42,53 +42,35 @@ def total_count(card)
   else
     card_value = 0
   end
-
-  # binding.pry
-
   $count += card_value
 end
 
 def total_cards(cards)
   hand_total = 0
+  num_aces = 0
   cards.each do |card| 
     if value_and_suit = /(\d+)([hscd])/.match(card)
       card_value = value_and_suit[0].to_i
-      # binding.pry
     elsif value_and_suit = /([JQK])([hscd])/.match(card)
       card_value = 10
     elsif value_and_suit = /(A)([hscd])/.match(card)
+      num_aces += 1
       card_value = 11
     end
 
     hand_total += card_value
 
+    while hand_total > 21 && num_aces > 0
+      hand_total -= 10
+      num_aces -= 1
+    end 
+
   end
   hand_total
 end
 
-def no_aces?(hand)
-  hand.select { |v| /A/.match(v) }.empty?
-end
-
-def aces?(hand)
-  hand.select { |v| /A/.match(v) }.size
-end
-
-def reduce_aces(hand)
-  hand.each do |card| 
-    card.gsub!(/A/, "1")
-    # binding.pry
-    break if total_cards(hand) <= 21
-  end 
-end
-
 def bust?(hand)
-  temp_hand = Array.new(hand)
-  if aces?(temp_hand) > 0 && total_cards(temp_hand)  > 21
-    reduce_aces(temp_hand)
-  end
-  # total_cards(hand) > 21
-  total_cards(temp_hand) > 21
+ total_cards(hand) > 21
 end
 
 def show_help (msg)
@@ -114,23 +96,33 @@ def show_help (msg)
   puts "2-6 = +1"
   puts "T-A = -1"
 
-  puts "#{msg}"
+  puts msg
   puts "enter to continue"
   gets.chomp
+end
+
+def print_cards(hand)
+  hand.each do |card|
+      print card + "  "
+  end
 end
 
 def show_hands(player_name, player_hand, dealer_hand, turn = PLAYER)
   system 'clear'
 
-  puts "#{player_name}: #{player_hand.inspect}"
-  # puts "no aces" if aces?(player_hand) == 0
+  puts player_name + ": (#{ total_cards(player_hand) })"
+  print_cards(player_hand)
+
+  print "\n\n"
+
   if (turn == DEALER)
-    puts "Dealer: #{dealer_hand.inspect}, #{total_cards(dealer_hand)}"
+    puts "Dealer: (#{ total_cards(dealer_hand) })"
+    print_cards(dealer_hand)
   else
-    puts "Dealer: #{dealer_hand[0]}, Xx"
+    puts "Dealer:"
+    print dealer_hand[0]
+    puts ", Xx"
   end
-  # puts "no aces" if aces?(dealer_hand) == 0
-  
 end
 
 puts "Welcome to blackjack!  Please enter your name: "
@@ -138,6 +130,7 @@ player_name = gets.chomp
 player_name = "Player 1" if player_name.size == 0
 puts "How many decks?"
 num_decks = gets.chomp.to_i
+num_decks = 1 if num_decks < 1
 
 shoe = init_shoe(num_decks)
 show_help "new deck..."
@@ -149,30 +142,23 @@ begin
   player_hand = []
   dealer_hand = []
 
-  # binding.pry
   if shoe.size < 52 * 0.3
     shoe =  init_shoe(num_decks)
     show_help "new deck..."
   end
-  #deal_cards
-  (1..2).each do 
+
+  2.times do 
     player_hand << deal_card(shoe)
     dealer_hand << deal_card(shoe)
   end
 
   # binding.pry
-  
-  #  change this to just check for aces
-  bust?(player_hand)
-  bust?(dealer_hand)
-  show_hands(player_name, player_hand, dealer_hand)
 
-  # binding.pry
+  show_hands(player_name, player_hand, dealer_hand)
 
   if total_cards(dealer_hand) == 21
     show_hands(player_name, player_hand, dealer_hand, DEALER)
     puts "Dealer has Blajack!"
-    # binding.pry
   elsif total_cards(player_hand) == 21
     show_hands(player_name, player_hand, dealer_hand, DEALER)
     puts "#{player_name} has Blajack!"
@@ -181,19 +167,16 @@ begin
       puts "\n(h)it or (s)tand or help"
       user_choice = gets.chomp.downcase
       player_hand << deal_card(shoe) if user_choice == 'h'
-      show_help 'Count = #{$count}'  if user_choice == 'help'
-      break if bust?(player_hand) || total_cards(player_hand) == 21
+      show_help ('Count = #{$count}')  if user_choice == 'help'
       show_hands(player_name, player_hand, dealer_hand)
       
-    end until user_choice == 's'
+    end until user_choice == 's' || bust?(player_hand) || total_cards(player_hand) == 21
 
-    # binding.pry
-    while  !bust?(dealer_hand) && total_cards(dealer_hand) < 17
-      # binding.pry
+    until bust?(dealer_hand) || total_cards(dealer_hand) >= 17 do
       dealer_hand << deal_card(shoe)
       show_hands(player_name, player_hand, dealer_hand, DEALER)
       sleep 1
-    end
+    end 
 
     show_hands(player_name, player_hand, dealer_hand, DEALER)
 
@@ -201,21 +184,20 @@ begin
       puts "\nits a push"
     elsif bust?(player_hand) || (total_cards(player_hand) < total_cards(dealer_hand) && !bust?(dealer_hand))
       puts "\nHouse wins"
-      # binding.pry
-    elsif bust?(dealer_hand) && !bust?(player_hand) || (total_cards(player_hand) > total_cards(dealer_hand) && !bust?(player_hand)) || total_cards(player_hand) == 21
+    elsif bust?(dealer_hand) && !bust?(player_hand) || 
+            (total_cards(player_hand) > total_cards(dealer_hand) && !bust?(player_hand)) || 
+            total_cards(player_hand) == 21
       puts "\n#{player_name} wins"
     end
   end
 
-  # binding.pry
   puts "whats the count?"
   count_answer = gets.chomp.to_i
   if count_answer == $count 
-    puts "Correct!  The current count is #{$count}.  Decks remaining = #{shoe.size / 52.0}"
+    puts "Correct!  The current count is #{$count}.  Decks remaining = #{ (shoe.size / 52.0).round(2) }"
   else
-    puts "Incorrect.  The current count is #{$count}.  Decks remaining = #{shoe.size / 52.0}"
+    puts "Incorrect.  The current count is #{$count}.  Decks remaining = #{ (shoe.size / 52.0).round (2)}"
   end
-  # puts "count = #{$count}"
 
   puts "play again? y/n"
   play_again = gets.chomp.downcase
