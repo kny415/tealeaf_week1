@@ -13,12 +13,28 @@ require 'pry'
 PLAYER = 1
 DEALER = 2
 
-DECK = [
-              '2h', '3h', '4h', '5h', '6h', '7h', '8h', '9h', '10h', 'Jh', 'Qh', 'Kh', 'Ah', 
-              '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '10s', 'Js', 'Qs', 'Ks', 'As', 
-              '2c', '3c', '4c', '5c', '6c', '7c', '8c', '9c', '10c', 'Jc', 'Qc', 'Kc', 'Ac', 
-              '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', 'Jd', 'Qd', 'Kd', 'Ad'
-              ]
+# DECK = [
+#               '2h', '3h', '4h', '5h', '6h', '7h', '8h', '9h', '10h', 'Jh', 'Qh', 'Kh', 'Ah', 
+#               '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '10s', 'Js', 'Qs', 'Ks', 'As', 
+#               '2c', '3c', '4c', '5c', '6c', '7c', '8c', '9c', '10c', 'Jc', 'Qc', 'Kc', 'Ac', 
+#               '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', 'Jd', 'Qd', 'Kd', 'Ad'
+#               ]
+
+RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = ['h', 's', 'c', 'd']
+
+# DECK = SUITS.product(RANKS)
+
+# DECK = RANKS.map { |rank| rank + SUITS[0]}
+DECK = []
+
+SUITS.each do |suit|
+  RANKS.each do |rank|
+    DECK << rank + suit 
+  end
+end
+
+# binding.pry
 
 def init_shoe(num_decks = 1)
   shoe = []
@@ -32,7 +48,7 @@ end
 
 def count_value(card)
   if value_and_suit = /([2-6])([hscd])/.match(card)
-    card_value = +1
+    card_value = 1
   elsif value_and_suit = /([10JQKA])([hscd])/.match(card)
     card_value = -1
   else
@@ -103,9 +119,9 @@ end
 
 def print_cards(hand)
   hand.each do |card|
-      print card + "  "
+    print card + "  "
   end
-  print "\n"
+  puts
 end
 
 def show_hands(player_name, player_hand, dealer_hand, turn = PLAYER)
