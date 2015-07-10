@@ -28,12 +28,17 @@ SUITS = ['h', 's', 'c', 'd']
 # DECK = RANKS.map { |rank| rank + SUITS[0]}
 DECK = []
 
+# SUITS.each do |suit|
+#   RANKS.each do |rank|
+#     DECK << rank + suit 
+#   end
+# end
+
 SUITS.each do |suit|
-  RANKS.each do |rank|
-    DECK << rank + suit 
-  end
+  DECK << RANKS.map { |rank| rank + suit }
 end
 
+DECK.flatten!
 # binding.pry
 
 def init_shoe(num_decks = 1)
